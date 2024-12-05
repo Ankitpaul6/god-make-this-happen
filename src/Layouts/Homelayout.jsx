@@ -1,9 +1,18 @@
 import {AiFillCloseCircle} from 'react-icons/ai';
 import {FiMenu} from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 import Footer from '../Components/Footer';
 
 function Homelayout({ children }) {
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    // for checking user is logged in
+    const isLoggedIn = useSelector((state) => state?.auth?.isLoggedIn);
+    // for displaying optionsacc to role
+    const role = useSelector((state) => state?.auth?.role);
 
     function changeWidth() {
         const drawerSide = document.getElementsByClassName("drawer-side");
@@ -14,8 +23,18 @@ function Homelayout({ children }) {
         const element = document.getElementsByClassName("drawer-toggle");
         element[0].checked = false;
 
-        changeWidth();
+        const drawerSide = document.getElementsByClassName("drawer-side");
+        drawerSide[0].style.width = '0';
     }
+    function handlelogout(e) {
+        e.preventDefault();
+       // const res =await dispatch(logout());
+      // if(res?.payload?.success)
+        navigate("/");
+    }
+
+  
+    
     return (
         <div className="min-h-[90vh]">
             <div className="drawer absolute left-0 z-50 w-fit">
@@ -41,6 +60,11 @@ function Homelayout({ children }) {
                     <li>
                         <Link to="/">Home</Link>
                     </li>
+                    {isLoggedIn && role == 'Admin' && (
+                        <li>
+                            <Link to="/admin/dashboard">Admin Dashboard</Link>
+                        </li>
+                    )}
                     <li>
                         <Link to="/courses">All courses</Link>
                     </li>
@@ -50,6 +74,33 @@ function Homelayout({ children }) {
                     <li>
                         <Link to="/about">About us</Link>
                     </li>
+
+                    {!isLoggedIn && (
+                        <li className="absolute bottom-4 w-[90%]">
+                        <div className='w-full flex items-center justify-center'>
+                            <button className='bg-blue-500 btn-primary px-4 py-1 font-semibold rounded-md w-full'>
+                                <Link to ="/login">Login</Link>
+                            </button>
+                            <button className='bg-purple-500 btn-secondary px-4 py-1 font-semibold rounded-md w-full'>
+                                <Link to ="/signup">signup</Link>
+                            </button>
+                        </div>
+                        </li>
+                    )}
+                    
+                    {isLoggedIn && (
+                        <li className="absolute bottom-4 w-[90%]">
+                        <div className='w-full flex items-center justify-center'>
+                            <button className='btn-primary px-4 py-1 font-semibold rounded-md w-full'>
+                                <Link to ="/user/profile">profile</Link>
+                            </button>
+                            <button className='btn-secondary px-4 py-1 font-semibold rounded-md w-full'>
+                                <Link onClick={handlelogout}>logout</Link>
+                            </button>
+                        </div>
+                        </li>
+                    )}
+
                 </ul>
 
             </div>
@@ -58,6 +109,7 @@ function Homelayout({ children }) {
             { children }
 
             <Footer/>
-        </div>    )
-}
+        </div>  
+          )
+        }
 export default Homelayout;
